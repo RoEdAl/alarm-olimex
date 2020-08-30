@@ -2,9 +2,9 @@
 
 pkgbase='uboot-olimex-32'
 pkgname=('uboot-olimex-a10' 'uboot-olimex-a13' 'uboot-olimex-a20')
-_commit=291cd781f040f8ca5dcfe14ea21ecda5e786ee06
+_commit=f77e0687cf505fa582979961fca2f3b2ed03a544
 # _commit_epoch=$(git show -s --format=%ct)
-_commit_epoch=1598803339
+_commit_epoch=1598806063
 _srcname=u-boot-olinuxino-${_commit}
 _pkgrelease=20200701
 pkgver=2020.01.${_pkgrelease}
@@ -25,7 +25,7 @@ source=("https://github.com/RoEdAl/u-boot-olinuxino/archive/${_commit}.tar.gz"
 	'config-fragment'
 	'mkscr.sh'
 )
-sha1sums=('2b62fb712191fa2e077765e1114d024bb3023942'
+sha1sums=('e8130ac2dfc842b3f9b6df5bcf50e97341600f05'
           '9f5d51937b0dde70b21f84dc93a2f770f3488226'
           'a49a8c18e1b0f920a430cf57990c0c42dc864f59'
           '2cd0bd7e1de5e498697ae80b8e3b7c423905b55b'
