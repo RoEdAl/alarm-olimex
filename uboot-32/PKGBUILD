@@ -1,0 +1,116 @@
+# Maintainer: Edmunt Pienkowsky <roed@onet.eu>
+
+pkgbase='uboot-olimex-32'
+pkgname=('uboot-olimex-a10' 'uboot-olimex-a13' 'uboot-olimex-a20')
+_commit=0624c15391efa84988dcca597319cc239cfab9e6
+# _commit_epoch=$(git show -s --format=%ct)
+_commit_epoch=1598784930
+_srcname=u-boot-olinuxino-${_commit}
+_pkgrelease=20200701
+pkgver=2020.01.${_pkgrelease}
+pkgrel=1
+arch=('armv7h')
+url='http://github.com/OLIMEX/u-boot-olinuxino'
+license=('GPL')
+options=('!strip')
+makedepends=('bc' 'swig' 'dtc')
+backup=('boot/boot.txt'
+	'boot/boot.scr'
+)
+
+# "${pkgbase}::git+https://github.com/OLIMEX/u-boot-olinuxino.git#branch=release-${_pkgrelease}"
+source=("https://github.com/RoEdAl/u-boot-olinuxino/archive/${_commit}.tar.gz"
+	'boot.txt'
+	'flash-uboot.sh'
+	'config-fragment'
+	'mkscr.sh'
+)
+sha1sums=('a062505ea5d73f75f483f43c5b7adcd226ff7b7d'
+          '9f5d51937b0dde70b21f84dc93a2f770f3488226'
+          'a49a8c18e1b0f920a430cf57990c0c42dc864f59'
+          '2cd0bd7e1de5e498697ae80b8e3b7c423905b55b'
+          '008b9ce4fcf64c939868148ca387fa733c8b7e69')
+
+_boards=('A10-OLinuXino' 'A13-OLinuXino' 'A20-OLinuXino')
+
+build() {
+  cd "${srcdir}/${_srcname}"
+
+  for i in ${_boards[@]}; do
+    msg2 ${i}
+    mkdir ../bin_${i} || true
+    make distclean
+    env SOURCE_DATE_EPOCH=$_commit_epoch make ${i}_config
+    scripts/kconfig/merge_config.sh .config ${srcdir}/config-fragment
+    env SOURCE_DATE_EPOCH=$_commit_epoch make EXTRAVERSION=.${_pkgrelease}-${pkgrel} VERBOSE=0
+    mv u-boot-sunxi-with-spl.bin ../bin_${i}
+    case $i in
+        A10-OLinuXino)
+        mv arch/arm/dts/sun4i-a10-olinuxino-*.dtb ../bin_${i}
+        ;;
+
+        A13-OLinuXino)
+        mv arch/arm/dts/sun5i-a13-olinuxino-*.dtb ../bin_${i}
+        mv arch/arm/dts/sun5i-a13-som-*.dtb ../bin_${i}
+        ;;
+
+        A20-OLinuXino)
+        mv arch/arm/dts/sun7i-a20-olinuxino-*.dtb ../bin_${i}
+        mv arch/arm/dts/sun7i-a20-olimex-*.dtb ../bin_${i}
+        ;;
+    esac
+  done
+
+  tools/mkimage -A arm -O linux -T script -C none -n 'U-Boot boot script' -d ../boot.txt ../boot.scr
+}
+
+package_uboot-olimex-a10() {
+  pkgdesc='U-Boot for AllWinner A10-based Olimex SBCs'
+  install=${pkgbase}.install
+  provides=('uboot-olimex')
+  conflicts=('uboot-sunxi' 'uboot-olimex')
+  optdepends=('uboot-tools')
+
+  install -dm0755 "${pkgdir}/boot/dtbs-extra"
+  install -Dm0644 bin_A10-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
+  install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+  cp bin_A10-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
+}
+
+package_uboot-olimex-a13() {
+  pkgdesc='U-Boot for AllWinner A13-based Olimex SBCs'
+  install=${pkgbase}.install
+  provides=('uboot-olimex')
+  conflicts=('uboot-sunxi' 'uboot-olimex' 'uboot-olinuxino')
+  optdepends=('uboot-tools')
+
+  install -dm0755 "${pkgdir}/boot/dtbs-extra"
+  install -Dm0644 bin_A13-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
+  install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+
+  cp bin_A13-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
+}
+
+
+package_uboot-olimex-a20() {
+  pkgdesc='U-Boot for AllWinner A20-based Olimex SBCs'
+  install=${pkgbase}.install
+  provides=('uboot-olimex')
+  conflicts=('uboot-sunxi' 'uboot-olimex')
+  optdepends=('uboot-tools')
+
+  install -dm0755 "${pkgdir}/boot/dtbs-extra"
+  install -Dm0644 bin_A20-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
+  install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+
+  cp bin_A20-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
+}
