@@ -1,7 +1,7 @@
 From 06cf748485ae5d419e0a96518ae713b7653194f6 Mon Sep 17 00:00:00 2001
 From: Edmunt Pienkowsky <roed@onet.eu>
 Date: Sun, 30 Aug 2020 17:13:43 +0200
-Subject: [PATCH 3/6] build correctly with CONFIG_ENV_IS_NOWHERE macro defined
+Subject: [PATCH 3/7] build correctly with CONFIG_ENV_IS_NOWHERE macro defined
 
 
 diff --git a/board/olimex/a10_olinuxino/board.c b/board/olimex/a10_olinuxino/board.c

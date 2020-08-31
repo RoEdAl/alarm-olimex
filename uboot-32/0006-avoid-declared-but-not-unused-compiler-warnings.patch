@@ -1,7 +1,7 @@
 From 08fdcb0c0334e7bdc9a539d9e5eb1d5c23d538a0 Mon Sep 17 00:00:00 2001
 From: Edmunt Pienkowsky <roed@onet.eu>
 Date: Sun, 30 Aug 2020 17:15:45 +0200
-Subject: [PATCH 6/6] avoid 'declared but not unused' compiler warnings
+Subject: [PATCH 6/7] avoid 'declared but not unused' compiler warnings
 
 
 diff --git a/board/olimex/a10_olinuxino/fdt.c b/board/olimex/a10_olinuxino/fdt.c

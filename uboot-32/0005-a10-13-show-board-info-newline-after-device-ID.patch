@@ -1,7 +1,7 @@
 From 72ecd19842aeab3e2f1dcef00199f5738a84a29b Mon Sep 17 00:00:00 2001
 From: Edmunt Pienkowsky <roed@onet.eu>
 Date: Sun, 30 Aug 2020 18:47:43 +0200
-Subject: [PATCH 5/6] a10/13: show-board-info - newline after device ID
+Subject: [PATCH 5/7] a10/13: show-board-info - newline after device ID
 
 
 diff --git a/board/olimex/a10_olinuxino/board.c b/board/olimex/a10_olinuxino/board.c

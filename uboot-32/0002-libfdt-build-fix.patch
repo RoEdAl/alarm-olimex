@@ -1,7 +1,7 @@
 From e84372c418e4f96a3312bef7e19758f71d8722f2 Mon Sep 17 00:00:00 2001
 From: Edmunt Pienkowsky <roed@onet.eu>
 Date: Sun, 30 Aug 2020 16:47:55 +0200
-Subject: [PATCH 2/6] libfdt: build fix
+Subject: [PATCH 2/7] libfdt: build fix
 
 
 diff --git a/scripts/dtc/dtc-lexer.l b/scripts/dtc/dtc-lexer.l

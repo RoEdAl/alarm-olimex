@@ -1,7 +1,7 @@
 From e16ac8e5c2713b3e7b1d73924af1a28cb882f041 Mon Sep 17 00:00:00 2001
 From: Edmunt Pienkowsky <roed@onet.eu>
 Date: Sun, 30 Aug 2020 17:17:29 +0200
-Subject: [PATCH 4/6] a20: fix axp209 configuration
+Subject: [PATCH 4/7] a20: fix axp209 configuration
 
 
 diff --git a/arch/arm/dts/sun7i-a20-olimex-som-evb.dts b/arch/arm/dts/sun7i-a20-olimex-som-evb.dts

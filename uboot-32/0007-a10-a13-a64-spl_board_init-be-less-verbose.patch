@@ -1,0 +1,108 @@
+From 0f53d6b047b3b94e531fd6074101471f5329faa1 Mon Sep 17 00:00:00 2001
+From: Edmunt Pienkowsky <roed@onet.eu>
+Date: Mon, 31 Aug 2020 11:23:30 +0200
+Subject: [PATCH 7/7] a10/a13/a64: spl_board_init - be less verbose
+
+a64: implement show_board_info
+
+diff --git a/board/olimex/a10_olinuxino/board.c b/board/olimex/a10_olinuxino/board.c
+index affe22c48f..85489f8d9e 100644
+--- a/board/olimex/a10_olinuxino/board.c
++++ b/board/olimex/a10_olinuxino/board.c
+@@ -23,13 +23,10 @@ DECLARE_GLOBAL_DATA_PTR;
+ #ifdef CONFIG_SPL_BUILD
+ void spl_board_init(void)
+ {
+-	printf("A10-Lime Board no eeprom found!\n ");
+-	
+ 	eeprom->header = OLINUXINO_EEPROM_MAGIC;
+ 	eeprom->id = 9999;
+ 	eeprom->revision.major = 'A';
+ 	eeprom->revision.minor = 0;
+-
+ }
+ #endif /* CONFIG_SPL_BUILD */
+ 
+diff --git a/board/olimex/a13_olinuxino/board.c b/board/olimex/a13_olinuxino/board.c
+index cd2075f3c0..5e4b8c04f5 100644
+--- a/board/olimex/a13_olinuxino/board.c
++++ b/board/olimex/a13_olinuxino/board.c
+@@ -21,34 +21,30 @@
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ #ifdef CONFIG_SPL_BUILD
++static const phys_size_t RAM_512M = 512 * 1024 * 1024;
++
+ void spl_board_init(void)
+ {
+-	int axp_power=0;
+-	printf("A13 Board no eeprom found!\n ");
+-	phys_size_t l = 512 * 1024 * 1024;	
++	int axp_power = 0;
+ 	
+ 	axp_power |= axp_init();
+ 	if (!axp_power) {
+-		printf("PMIC found board is A13-OLinuXino/ A13-OLinuXino WIFI !\n");			
+ 		eeprom->header = OLINUXINO_EEPROM_MAGIC;
+ 		eeprom->id = 4432;
+ 		eeprom->revision.major = 'A';
+ 		eeprom->revision.minor = 0;
+ 	} else {
+-		if (gd->ram_size == l) {
+-			printf("PMIC not found board is A13-SOM-512 \n");
++		if (gd->ram_size == RAM_512M) {
+ 	        	eeprom->header = OLINUXINO_EEPROM_MAGIC;
+ 	                eeprom->id = 4788;
+                 	eeprom->revision.major = 'A';
+                 	eeprom->revision.minor = 0;			
+ 		} else {
+-			printf("PMIC not found board is A13-SOM-256/A13-Micro\n");
+ 			eeprom->header = OLINUXINO_EEPROM_MAGIC;
+                 	eeprom->id = 4787;
+                 	eeprom->revision.major = 'A';
+                 	eeprom->revision.minor = 0;
+ 		}
+-
+ 	}
+ }
+ #endif /* CONFIG_SPL_BUILD */
+@@ -66,7 +62,7 @@ int show_board_info(void)
+ 
+ 	return 0;
+ }
+-#endif /* CONFIG_DISPLAY_BOARDINFO  */
++#endif /* CONFIG_DISPLAY_BOARDINFO */
+ 
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void)
+diff --git a/board/olimex/a64_olinuxino/board.c b/board/olimex/a64_olinuxino/board.c
+index 655336d5f1..c2b4ded53b 100644
+--- a/board/olimex/a64_olinuxino/board.c
++++ b/board/olimex/a64_olinuxino/board.c
+@@ -66,7 +66,22 @@ void spl_board_init(void)
+ 
+ 	eeprom->id = 8857;
+ }
+-#endif
++#endif /* CONFIG_SPL_BUILD  */
++
++#ifdef CONFIG_DISPLAY_BOARDINFO
++int show_board_info(void)
++{
++	char  rev[3];
++	const char *name;
++
++	name = olinuxino_get_board_name();
++
++	olinuxino_get_board_revision(rev);
++	printf("%-7s%s Rev.%s\n", "ID:", name, rev);
++
++	return 0;
++}
++#endif /* CONFIG_DISPLAY_BOARDINFO */
+ 
+ #ifdef CONFIG_LAST_STAGE_INIT
+ #ifdef CONFIG_VIDEO_LCD_OLINUXINO
+-- 
+2.28.0
+
