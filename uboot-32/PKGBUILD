@@ -2,9 +2,9 @@
 
 pkgbase='uboot-olimex-32'
 pkgname=('uboot-olimex-a10' 'uboot-olimex-a13' 'uboot-olimex-a20')
-_commit=f77e0687cf505fa582979961fca2f3b2ed03a544
+_commit=45475c072c870b01639c91cea88c82872db716d5
 # _commit_epoch=$(git show -s --format=%ct)
-_commit_epoch=1598806063
+_commit_epoch=1593621904
 _srcname=u-boot-olinuxino-${_commit}
 _pkgrelease=20200701
 pkgver=2020.01.${_pkgrelease}
@@ -18,14 +18,29 @@ backup=('boot/boot.txt'
 	'boot/boot.scr'
 )
 
-# "${pkgbase}::git+https://github.com/OLIMEX/u-boot-olinuxino.git#branch=release-${_pkgrelease}"
-source=("https://github.com/RoEdAl/u-boot-olinuxino/archive/${_commit}.tar.gz"
+_patches=(
+	0001-set-fdtfile-environment-variable.patch
+	0002-libfdt-build-fix.patch
+	0003-build-correctly-with-CONFIG_ENV_IS_NOWHERE-macro-def.patch
+	0004-a20-fix-axp209-configuration.patch
+	0005-a10-13-show-board-info-newline-after-device-ID.patch
+	0006-avoid-declared-but-not-unused-compiler-warnings.patch
+)
+
+source=("https://github.com/OLIMEX/u-boot-olinuxino/archive/${_commit}.tar.gz"
+	${_patches[@]}
 	'boot.txt'
 	'flash-uboot.sh'
 	'config-fragment'
 	'mkscr.sh'
 )
-sha1sums=('e8130ac2dfc842b3f9b6df5bcf50e97341600f05'
+sha1sums=('dbb0f540a507527edd788b84c62c2d8a4a5c957b'
+          '7a5c55b77ce64344b96e8624ecb8d95c7b2dc4a1'
+          'afcc67f68ac6775338e6aac1ef4cb9bc342cf476'
+          '66cc5f23ffcb08b7c97dac3c879aedd0e26986ab'
+          '22d218039b1e09df449da328065568cd0051c22e'
+          '330837ba50f15ac92c24c7fc15da0bf656f7dd8e'
+          '39d93d629304f6a9c74591a4176abc4768b25459'
           '9f5d51937b0dde70b21f84dc93a2f770f3488226'
           'a49a8c18e1b0f920a430cf57990c0c42dc864f59'
           '2cd0bd7e1de5e498697ae80b8e3b7c423905b55b'
@@ -33,16 +48,27 @@ sha1sums=('e8130ac2dfc842b3f9b6df5bcf50e97341600f05'
 
 _boards=('A10-OLinuXino' 'A13-OLinuXino' 'A20-OLinuXino')
 
+prepare() {
+  cd "${srcdir}/${_srcname}"
+
+  # custom patches
+  for i in ${_patches[@]}; do
+    # msg2 "Applying ${i}"
+    git apply ../${i}
+  done
+}
+
 build() {
+  local ENV_CMD="env SOURCE_DATE_EPOCH=$_commit_epoch"
   cd "${srcdir}/${_srcname}"
 
   for i in ${_boards[@]}; do
     msg2 ${i}
     mkdir ../bin_${i} || true
     make distclean
-    env SOURCE_DATE_EPOCH=$_commit_epoch make ${i}_config
+    $ENV_CMD make ${i}_config
     scripts/kconfig/merge_config.sh .config ${srcdir}/config-fragment
-    env SOURCE_DATE_EPOCH=$_commit_epoch make EXTRAVERSION=.${_pkgrelease}-${pkgrel} VERBOSE=0
+    $ENV_CMD make EXTRAVERSION=.${_pkgrelease}-${pkgrel} VERBOSE=0
     mv u-boot-sunxi-with-spl.bin ../bin_${i}
     case $i in
         A10-OLinuXino)
@@ -61,7 +87,7 @@ build() {
     esac
   done
 
-  tools/mkimage -A arm -O linux -T script -C none -n 'U-Boot boot script' -d ../boot.txt ../boot.scr
+  $ENV_CMD tools/mkimage -A arm -O linux -T script -C none -n 'U-Boot boot script' -d ../boot.txt ../boot.scr
 }
 
 package_uboot-olimex-a10() {

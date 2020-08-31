@@ -1,0 +1,185 @@
+From 08fdcb0c0334e7bdc9a539d9e5eb1d5c23d538a0 Mon Sep 17 00:00:00 2001
+From: Edmunt Pienkowsky <roed@onet.eu>
+Date: Sun, 30 Aug 2020 17:15:45 +0200
+Subject: [PATCH 6/6] avoid 'declared but not unused' compiler warnings
+
+
+diff --git a/board/olimex/a10_olinuxino/fdt.c b/board/olimex/a10_olinuxino/fdt.c
+index 69f7d79d99..8f5eb5a53a 100644
+--- a/board/olimex/a10_olinuxino/fdt.c
++++ b/board/olimex/a10_olinuxino/fdt.c
+@@ -43,7 +43,7 @@ static int board_set_compatible(void *fdt)
+ 	return 0;
+ }
+ 
+-static int board_enable_spi_flash(void *fdt)
++static int __maybe_unused board_enable_spi_flash(void *fdt)
+ {
+ 	uint32_t phandle;
+ 	int offset, ret = 0;
+@@ -119,36 +119,32 @@ static int board_enable_spi_flash(void *fdt)
+ 	return ret;
+ }
+ 
+-static int board_disable_gmac(void *fdt)
++static int __maybe_unused board_disable_gmac(void *fdt)
+ {
+-
+ 	return 0;
+ }
+ 
+-static int board_enable_emac(void *fdt)
++static int __maybe_unused board_enable_emac(void *fdt)
+ {
+ 	return 0;
+ }
+ 
+-static int board_disable_sdio(void *fdt)
++static int __maybe_unused board_disable_sdio(void *fdt)
+ {
+-
+ 	return 0;
+-
+ }
+ 
+ int board_fix_fdt(void *fdt)
+ {
+- int ret;
+-
+-        ret = fdt_increase_size(fdt, 4096);
+-        if (ret)
+-                return ret;
++	int ret;
+ 
+-        ret = board_set_compatible(fdt);
+-        if (ret)
+-                return ret;
++	ret = fdt_increase_size(fdt, 4096);
++	if (ret)
++		return ret;
+ 
++	ret = board_set_compatible(fdt);
++	if (ret)
++		return ret;
+ 
+ 	return 0;
+ }
+diff --git a/board/olimex/a13_olinuxino/fdt.c b/board/olimex/a13_olinuxino/fdt.c
+index 69f7d79d99..8f5eb5a53a 100644
+--- a/board/olimex/a13_olinuxino/fdt.c
++++ b/board/olimex/a13_olinuxino/fdt.c
+@@ -43,7 +43,7 @@ static int board_set_compatible(void *fdt)
+ 	return 0;
+ }
+ 
+-static int board_enable_spi_flash(void *fdt)
++static int __maybe_unused board_enable_spi_flash(void *fdt)
+ {
+ 	uint32_t phandle;
+ 	int offset, ret = 0;
+@@ -119,36 +119,32 @@ static int board_enable_spi_flash(void *fdt)
+ 	return ret;
+ }
+ 
+-static int board_disable_gmac(void *fdt)
++static int __maybe_unused board_disable_gmac(void *fdt)
+ {
+-
+ 	return 0;
+ }
+ 
+-static int board_enable_emac(void *fdt)
++static int __maybe_unused board_enable_emac(void *fdt)
+ {
+ 	return 0;
+ }
+ 
+-static int board_disable_sdio(void *fdt)
++static int __maybe_unused board_disable_sdio(void *fdt)
+ {
+-
+ 	return 0;
+-
+ }
+ 
+ int board_fix_fdt(void *fdt)
+ {
+- int ret;
+-
+-        ret = fdt_increase_size(fdt, 4096);
+-        if (ret)
+-                return ret;
++	int ret;
+ 
+-        ret = board_set_compatible(fdt);
+-        if (ret)
+-                return ret;
++	ret = fdt_increase_size(fdt, 4096);
++	if (ret)
++		return ret;
+ 
++	ret = board_set_compatible(fdt);
++	if (ret)
++		return ret;
+ 
+ 	return 0;
+ }
+diff --git a/board/olimex/common/cmd.c b/board/olimex/common/cmd.c
+index 57e6a52a76..783a4de77b 100644
+--- a/board/olimex/common/cmd.c
++++ b/board/olimex/common/cmd.c
+@@ -14,7 +14,7 @@
+ #include <olimex/lcd_olinuxino.h>
+ #include <olimex/sys_eeprom.h>
+ 
+-#if defined(CONFIG_TARGET_A20_OLINUXINO)
++#ifdef CONFIG_TARGET_A20_OLINUXINO
+ static int do_config_info(cmd_tbl_t *cmdtp, int flag,
+ 			  int argc, char *const argv[])
+ {
+@@ -239,16 +239,17 @@ static cmd_tbl_t cmd_monitor[] = {
+ };
+ #endif /* CONFIG_VIDEO_LCD_OLINUXINO */
+ 
++#if defined(CONFIG_TARGET_A20_OLINUXINO) || defined(CONFIG_VIDEO_LCD_OLINUXINO)
+ static int do_olinuxino_opts(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
+ {
+-	cmd_tbl_t *cp;
++	cmd_tbl_t __maybe_unused *cp;
+ 
+ #ifdef CONFIG_VIDEO_LCD_OLINUXINO
+ 	if (!strcmp(argv[0], "monitor"))
+ 		cp = find_cmd_tbl(argv[1], cmd_monitor, ARRAY_SIZE(cmd_monitor));
+ 	else
+ #endif
+-#if defined(CONFIG_TARGET_A20_OLINUXINO)
++#ifdef CONFIG_TARGET_A20_OLINUXINO
+ 	if (!strcmp(argv[0], "config"))
+ 		cp = find_cmd_tbl(argv[1], cmd_config, ARRAY_SIZE(cmd_config));
+ 	else
+@@ -267,7 +268,7 @@ static int do_olinuxino_opts(cmd_tbl_t *cmdtp, int flag, int argc, char *const a
+ }
+ 
+ static cmd_tbl_t cmd_olinuxino[] = {
+-#if defined(CONFIG_TARGET_A20_OLINUXINO)
++#ifdef CONFIG_TARGET_A20_OLINUXINO
+ 	U_BOOT_CMD_MKENT(config, CONFIG_SYS_MAXARGS, 0, do_olinuxino_opts, "", ""),
+ #endif
+ #ifdef CONFIG_VIDEO_LCD_OLINUXINO
+@@ -296,7 +297,7 @@ U_BOOT_CMD(
+ 	olinuxino, 7, 0, do_olinuxino_ops,
+ 	"OLinuXino board configurator",
+ 	"\n"
+-#if defined(CONFIG_TARGET_A20_OLINUXINO)
++#ifdef CONFIG_TARGET_A20_OLINUXINO
+ 	"olinuxino config info		- Print current configuration: ID, serial, ram, storage, grade...\n"
+ 	"olinuxino config list		- Print supported boards and their IDs\n"
+ 	"olinuxino config erase		- Erase currently stored configuration\n"
+@@ -316,3 +317,4 @@ U_BOOT_CMD(
+ 	"olinuxino monitor set		- Set specific LCD\n"
+ #endif
+ );
++#endif
+-- 
+2.28.0
+

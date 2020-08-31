@@ -1,0 +1,74 @@
+From 72ecd19842aeab3e2f1dcef00199f5738a84a29b Mon Sep 17 00:00:00 2001
+From: Edmunt Pienkowsky <roed@onet.eu>
+Date: Sun, 30 Aug 2020 18:47:43 +0200
+Subject: [PATCH 5/6] a10/13: show-board-info - newline after device ID
+
+
+diff --git a/board/olimex/a10_olinuxino/board.c b/board/olimex/a10_olinuxino/board.c
+index c76b8f7216..affe22c48f 100644
+--- a/board/olimex/a10_olinuxino/board.c
++++ b/board/olimex/a10_olinuxino/board.c
+@@ -25,10 +25,10 @@ void spl_board_init(void)
+ {
+ 	printf("A10-Lime Board no eeprom found!\n ");
+ 	
+-		eeprom->header = OLINUXINO_EEPROM_MAGIC;
+-		eeprom->id = 9999;
+-		eeprom->revision.major = 'A';
+-		eeprom->revision.minor = 0;
++	eeprom->header = OLINUXINO_EEPROM_MAGIC;
++	eeprom->id = 9999;
++	eeprom->revision.major = 'A';
++	eeprom->revision.minor = 0;
+ 
+ }
+ #endif /* CONFIG_SPL_BUILD */
+@@ -36,17 +36,14 @@ void spl_board_init(void)
+ #ifdef CONFIG_DISPLAY_BOARDINFO
+ int show_board_info(void)
+ {
+-	char  rev[3];
+ 	const char *name;
+ 
+ 	name = olinuxino_get_board_name();
+-
+-	olinuxino_get_board_revision(rev);
+-	printf("%-7s%s Rev.%s", "ID:", name, rev);
++	printf("%-7s%s\n", "ID:", name);
+ 
+ 	return 0;
+ }
+-#endif
++#endif /* CONFIG_DISPLAY_BOARDINFO */
+ 
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void)
+@@ -54,6 +51,7 @@ int board_late_init(void)
+ 	int pin;
+ 
+ 	pin = sunxi_name_to_gpio("PC3");
++	if (pin<=0) return 0;
+ 
+ 	gpio_request(pin, "satapwr");
+ 	gpio_direction_output(pin, 1);
+diff --git a/board/olimex/a13_olinuxino/board.c b/board/olimex/a13_olinuxino/board.c
+index 14bd37eeaf..cd2075f3c0 100644
+--- a/board/olimex/a13_olinuxino/board.c
++++ b/board/olimex/a13_olinuxino/board.c
+@@ -62,11 +62,11 @@ int show_board_info(void)
+ 	name = olinuxino_get_board_name();
+ 
+ 	olinuxino_get_board_revision(rev);
+-	printf("%-7s%s Rev.%s", "ID:", name, rev);
++	printf("%-7s%s Rev.%s\n", "ID:", name, rev);
+ 
+ 	return 0;
+ }
+-#endif
++#endif /* CONFIG_DISPLAY_BOARDINFO  */
+ 
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void)
+-- 
+2.28.0
+
