@@ -3,8 +3,6 @@
 pkgbase='uboot-olimex-32'
 pkgname=('uboot-olimex-a10' 'uboot-olimex-a13' 'uboot-olimex-a20')
 _commit=45475c072c870b01639c91cea88c82872db716d5
-# _commit_epoch=$(git show -s --format=%ct)
-_commit_epoch=1593621904
 _srcname=u-boot-olinuxino-${_commit}
 _pkgrelease=20200701
 pkgver=2020.01.${_pkgrelease}
@@ -14,7 +12,8 @@ url='http://github.com/OLIMEX/u-boot-olinuxino'
 license=('GPL')
 options=('!strip')
 makedepends=('bc' 'swig' 'dtc')
-backup=('boot/boot.txt'
+backup=(
+	'boot/boot.txt'
 	'boot/boot.scr'
 )
 
@@ -28,7 +27,8 @@ _patches=(
 	0007-a10-a13-a64-spl_board_init-be-less-verbose.patch
 )
 
-source=("https://github.com/OLIMEX/u-boot-olinuxino/archive/${_commit}.tar.gz"
+source=(
+	"https://github.com/OLIMEX/u-boot-olinuxino/archive/${_commit}.tar.gz"
 	${_patches[@]}
 	'boot.txt'
 	'flash-uboot.sh'
@@ -61,16 +61,15 @@ prepare() {
 }
 
 build() {
-  local ENV_CMD="env SOURCE_DATE_EPOCH=$_commit_epoch"
   cd "${srcdir}/${_srcname}"
 
   for i in ${_boards[@]}; do
     msg2 ${i}
     mkdir ../bin_${i} || true
     make distclean
-    $ENV_CMD make ${i}_config
+    make ${i}_config
     scripts/kconfig/merge_config.sh .config ${srcdir}/config-fragment
-    $ENV_CMD make EXTRAVERSION=.${_pkgrelease}-${pkgrel} VERBOSE=0
+    make EXTRAVERSION=.${_pkgrelease}-${pkgrel} VERBOSE=0
     mv u-boot-sunxi-with-spl.bin ../bin_${i}
     case $i in
         A10-OLinuXino)
@@ -89,8 +88,7 @@ build() {
     esac
   done
 
-  $ENV_CMD tools/mkimage -A arm -O linux -T script -C none -n 'U-Boot boot script' -d ../boot.txt ../boot.scr
-  touch -c -d @${_commit_epoch} ../boot.scr
+  tools/mkimage -A arm -O linux -T script -C none -n 'U-Boot boot script' -d ../boot.txt ../boot.scr
 }
 
 package_uboot-olimex-a10() {
@@ -103,9 +101,9 @@ package_uboot-olimex-a10() {
   install -dm0755 "${pkgdir}/boot/dtbs-extra"
   install -Dm0644 bin_A10-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
   install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
-  install -pDm0644 boot.scr "${pkgdir}/boot/boot.scr"
-  install -pDm0755 mkscr.sh "${pkgdir}/boot/mkscr"
-  install -pDm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
 
   cp bin_A10-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
 }
@@ -120,9 +118,9 @@ package_uboot-olimex-a13() {
   install -dm0755 "${pkgdir}/boot/dtbs-extra"
   install -Dm0644 bin_A13-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
   install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
-  install -pDm0644 boot.scr "${pkgdir}/boot/boot.scr"
-  install -pDm0755 mkscr.sh "${pkgdir}/boot/mkscr"
-  install -pDm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
 
   cp bin_A13-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
 }
@@ -138,9 +136,9 @@ package_uboot-olimex-a20() {
   install -dm0755 "${pkgdir}/boot/dtbs-extra"
   install -Dm0644 bin_A20-OLinuXino/u-boot-sunxi-with-spl.bin "${pkgdir}/boot/u-boot-sunxi-with-spl.bin"
   install -Dm0644 boot.txt "${pkgdir}/boot/boot.txt"
-  install -pDm0644 boot.scr "${pkgdir}/boot/boot.scr"
-  install -pDm0755 mkscr.sh "${pkgdir}/boot/mkscr"
-  install -pDm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
+  install -Dm0644 boot.scr "${pkgdir}/boot/boot.scr"
+  install -Dm0755 mkscr.sh "${pkgdir}/boot/mkscr"
+  install -Dm0755 flash-uboot.sh "${pkgdir}/boot/flash-uboot"
 
   cp bin_A20-OLinuXino/*.dtb "${pkgdir}/boot/dtbs-extra"
 }
